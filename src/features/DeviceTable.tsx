@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from "react";
+import React, {useEffect} from "react";
 import axios, {AxiosResponse} from "axios";
 import {DevicesMessage} from "../common";
 import {DataGrid, GridColumns, GridToolbarQuickFilter, ruRU} from "@mui/x-data-grid";
@@ -6,6 +6,7 @@ import {DataGrid, GridColumns, GridToolbarQuickFilter, ruRU} from "@mui/x-data-g
 const defaultColumnOptions = {
     editable: false,
     sortable: false,
+    cellClassName: "table-cell-wrap"
 }
 
 const columns: GridColumns = [
@@ -15,14 +16,14 @@ const columns: GridColumns = [
         ...defaultColumnOptions,
         headerAlign: "center",
         align: "center",
-        flex: 1,
+        flex: 2,
     }, {
         field: "area",
         headerName: "Район",
         ...defaultColumnOptions,
         headerAlign: "center",
         align: "center",
-        flex: 1,
+        flex: 2,
     }, {
         field: "idd",
         headerName: "ID",
@@ -36,7 +37,7 @@ const columns: GridColumns = [
         ...defaultColumnOptions,
         headerAlign: "center",
         align: "center",
-        flex: 1,
+        flex: 1.5,
     }, {
         field: "description",
         headerName: "Описание",
@@ -64,11 +65,14 @@ function DeviceTable(props: {deviceInfo: DevicesMessage | undefined, setDeviceIn
         })
     }, [])
 
-    const rows = props.deviceInfo?.devices.map((dev, index) => {
+    const rows = props.deviceInfo?.devices?.map((dev, index) => {
+        const region = props.deviceInfo?.regionInfo[dev.region] ?? ""
         return {
-            ...dev,
+            region,
+            area: props.deviceInfo?.areaInfo[region][dev.area],
             idd: dev.ID,
-            id: dev.idevice
+            id: dev.idevice,
+            description: dev.description
         }
     })
 
@@ -81,7 +85,7 @@ function DeviceTable(props: {deviceInfo: DevicesMessage | undefined, setDeviceIn
                 experimentalFeatures={{newEditingApi: true}}
                 disableColumnMenu
                 hideFooter
-                checkboxSelection={true}
+                // checkboxSelection={true}
                 onSelectionModelChange={(newSelectionModel) => {
                     console.log(newSelectionModel)
                     props.setSelectedIdevices(newSelectionModel)
@@ -91,6 +95,7 @@ function DeviceTable(props: {deviceInfo: DevicesMessage | undefined, setDeviceIn
                 }}
                 density="comfortable"
             />}
+            {!rows && <p>Журналов не найдено</p>}
         </div>
     )
 }
