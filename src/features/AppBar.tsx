@@ -3,7 +3,7 @@ import React from "react";
 import {Device, DeviceJournalMessage, DevicesMessage} from "../common";
 import axios, {AxiosResponse} from "axios";
 
-function AppBar(props: { selectedDevices: (Device | undefined)[], setJournal: Function, setDeviceInfo: Function }) {
+function AppBar(props: { selectedDevices: (Device | undefined)[], setJournal: Function, deviceInfo: DevicesMessage | undefined, setDeviceInfo: Function }) {
     const handleLoadJournal = () => {
         let href = ""
         if (!process.env.NODE_ENV || process.env.NODE_ENV === "development") {
@@ -23,18 +23,14 @@ function AppBar(props: { selectedDevices: (Device | undefined)[], setJournal: Fu
         if (!process.env.NODE_ENV || process.env.NODE_ENV === "development") {
             href = "https://192.168.115.134:4443/user/Admin/deviceJournal/clear"
         } else {
-            href = window.location.href + "/info"
+            href = window.location.href + "/clear"
         }
         axios.post(href, {devices: props.selectedDevices})
             .then((response: AxiosResponse<DeviceJournalMessage>) => {
-                let href = "https://192.168.115.134:4443/user/Admin/deviceJournal"
-                axios.post(
-                    href,
-                ).then((response: AxiosResponse<DevicesMessage>) => {
-                    props.setDeviceInfo(response.data)
-                }).catch((error) => {
-                    window.alert(error.message)
-                })
+                props.setJournal({})
+                const cope: DevicesMessage = JSON.parse(JSON.stringify(props.deviceInfo))
+                cope.devices = cope.devices.filter(dev => dev.idevice !== props.selectedDevices[0]?.idevice)
+                props.setDeviceInfo(cope)
             })
             .catch((error) => window.alert(error.message))
     }

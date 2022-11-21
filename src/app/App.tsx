@@ -15,6 +15,7 @@ function App() {
             <div style={{height: "10%", width: "40%"}}>
                 <AppBar setJournal={setJournal}
                         selectedDevices={selectedIdevices.map(idevice => deviceInfo?.devices.find(dev => dev.idevice === idevice))}
+                        deviceInfo={deviceInfo}
                         setDeviceInfo={setDeviceInfo}
                 />
             </div>
